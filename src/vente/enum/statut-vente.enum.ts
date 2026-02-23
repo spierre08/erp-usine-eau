@@ -1,0 +1,7 @@
+export enum StatutEnum {
+  EN_ATTENTE = 'EN_ATTENTE',
+  PAYE_PARTIEL = 'PAYE_PARTIEL',
+  PAYE = 'PAYE',
+  LIVREE = 'LIVREE',
+  ANNULEE = 'ANNULEE',
+}

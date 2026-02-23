@@ -1,0 +1,56 @@
+name: ERP_Kagbelen CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build project
+        run: yarn build
+
+      - name: Start NestJS server in background
+        run: |
+          nohup node dist/main.js &
+          echo $! > server.pid
+          echo "Server started in background with PID $(cat server.pid)"
+
+      - name: Wait for server to be ready
+        run: |
+          MAX_RETRIES=10
+          RETRY_COUNT=0
+          until curl --silent --output /dev/null http://localhost:8086/; do
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ "$RETRY_COUNT" -ge "$MAX_RETRIES" ]; then
+              echo "Server did not start correctly after $MAX_RETRIES attempts"
+              kill $(cat server.pid)
+              exit 1
+            fi
+            echo "Waiting for server to start... ($RETRY_COUNT/$MAX_RETRIES)"
+            sleep 2
+          done
+          echo "Server is up and running"
+
+      - name: Stop NestJS server
+        if: always()
+        run: |
+          kill $(cat server.pid)
+          rm server.pid
+          echo "Server stopped"

@@ -1,0 +1,6 @@
+export enum CategoryTransactionEnum {
+  VENTE = 'VENTE',
+  DEPENSE = 'DEPENSE',
+  SALAIRE = 'SALAIRE',
+  APPROVISIONNEMENT = 'APPROVISIONNEMENT',
+}
