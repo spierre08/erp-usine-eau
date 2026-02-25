@@ -26,7 +26,7 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'https://eau-erp.netlify.app'],
+    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:8082', 'https://eau-erp.netlify.app', 'https://erp-eau-usine.onrender.com'],
     methods: 'GET,PATCH,POST,DELETE',
     credentials: true,
   });
