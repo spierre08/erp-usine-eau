@@ -187,6 +187,85 @@ export class TransactionService {
     return response
   }
 
+  async getEntreesSemaineParJour() {
+    const today = new Date();
+    const day = today.getDay(); 
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diffToMonday);
+    monday.setHours(0, 0, 0, 0);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+
+    const result = await this.transactionModel.aggregate([
+      {
+        $match: {
+          type_transaction: 'ENTRE',
+          createdAt: { $gte: monday, $lte: sunday },
+        },
+      },
+      {
+        $group: {
+          _id: { $isoDayOfWeek: '$createdAt' }, 
+          total: { $sum: '$montant' },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    const joursMap = {
+      1: 'Lundi',
+      2: 'Mardi',
+      3: 'Mercredi',
+      4: 'Jeudi',
+      5: 'Vendredi',
+      6: 'Samedi',
+      7: 'Dimanche',
+    };
+
+    const semaineComplete = Array.from({ length: 7 }, (_, i) => {
+      const jourNum = i + 1;
+      const found = result.find(r => r._id === jourNum);
+      return {
+        jour: joursMap[jourNum],
+        total: found ? found.total : 0,
+      };
+    });
+
+    return semaineComplete;
+  } 
+
+  async getChiffreAffaireDuMois() {
+    const now = new Date();
+
+    const debutMois = new Date(now.getFullYear(), now.getMonth(), 1);
+    debutMois.setHours(0, 0, 0, 0);
+
+    const finMois = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    finMois.setHours(23, 59, 59, 999);
+
+    const result = await this.transactionModel.aggregate([
+      {
+        $match: {
+          categorie_transaction: 'VENTE',
+          type_transaction: 'ENTRE',
+          createdAt: { $gte: debutMois, $lte: finMois },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          chiffreAffaire: { $sum: '$montant' },
+        },
+      },
+    ]);
+
+    return result[0]?.chiffreAffaire || 0;
+  }
+
   async update(id: string, data: any) {
     if (!Util.ObjectId.isValid(id)){
       throw new BadRequestException('L\'id de la transaction est invalide')

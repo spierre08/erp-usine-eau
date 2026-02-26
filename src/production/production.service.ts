@@ -86,6 +86,33 @@ export class ProductionService {
     return responses;
   }
 
+  async getProductionMensuelle() {
+    const now = new Date();
+
+    const debutMois = new Date(now.getFullYear(), now.getMonth(), 1);
+    debutMois.setHours(0, 0, 0, 0);
+
+    const finMois = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    finMois.setHours(23, 59, 59, 999);
+
+    const result = await this.productionModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: debutMois, $lte: finMois },
+          status: 'TERMINE',
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalProduction: { $sum: '$quantite_produite' },
+        },
+      },
+    ]);
+
+    return result[0]?.totalProduction || 0;
+  }
+
   async update(id: string, data: ProductionDto) {
     if (!Util.ObjectId.isValid(id)) {
       throw new BadRequestException("L'id est invalide");

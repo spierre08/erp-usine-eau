@@ -21,6 +21,11 @@ export class VenteController {
     return await this.venteService.create(data);
   }
 
+  @Get("total-ventes-realisees-mois")
+  async getTotalVentesRealiseesMois() {
+    return await this.venteService.getTotalVentesRealiseesMois();
+  }
+
   @Get(":id")
   async getById(@Param("id") id: string) {
     return await this.venteService.getById(id)

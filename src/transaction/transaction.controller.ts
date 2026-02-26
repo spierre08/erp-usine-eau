@@ -7,7 +7,7 @@ import { Role } from 'src/auth/enum/role.enum';
 
 @Controller('transactions')
 export class TransactionController {
-  constructor(private readonly transactionService: TransactionService) {}
+  constructor(private readonly transactionService: TransactionService) { }
 
   @Roles(Role.ADMIN, Role.COMPTABLE)
   @Post()
@@ -25,6 +25,18 @@ export class TransactionController {
   @Get('kpi')
   async kpi(@Query() filter: Record<string, any>) {
     return await this.transactionService.kpi(filter);
+  }
+
+  @Roles(Role.ADMIN, Role.COMPTABLE)
+  @Get('entre-semaine-par-jour')
+  async getEntreesSemaineParJour() {
+    return await this.transactionService.getEntreesSemaineParJour()
+  }
+
+  @Roles(Role.ADMIN, Role.COMPTABLE)
+  @Get('chiffre-affaire-du-mois')
+  async getChiffreAffaireDuMois() {
+    return await this.transactionService.getChiffreAffaireDuMois()
   }
 
   @Roles(Role.ADMIN, Role.COMPTABLE)

@@ -23,6 +23,11 @@ export class ProductionController {
     return this.productionService.create(data);
   }
 
+  @Get('mensuelle')
+  getProductionMensuelle() {
+    return this.productionService.getProductionMensuelle();
+  }
+
   @Roles(Role.ADMIN)
   @Get()
   getAll(@Query() filter: any) {

@@ -44,6 +44,10 @@ export class ArticleService {
     return response;
   }
 
+  async getNombreArticles() {
+    return this.articleModel.countDocuments();
+  }
+
   async findAll(filter: any) {
     const { page = 1, limit = 40, nom_article } = filter;
     const query: Record<string, any> = {};

@@ -25,6 +25,11 @@ export class ArticleController {
     return this.articleService.create(createArticleDto);
   }
 
+  @Get('total-article')
+  getNombreArticles() {
+    return this.articleService.getNombreArticles();
+  }
+
   @Roles(Role.ADMIN, Role.COMPTABLE)
   @Get()
   findAll(@Query() filter: any) {

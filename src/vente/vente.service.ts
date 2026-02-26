@@ -203,6 +203,27 @@ export class VenteService {
     };
   }
 
+  async getTotalVentesRealiseesMois() {
+    const now = new Date();
+    
+    const debutMois = new Date(now.getFullYear(), now.getMonth(), 1);
+    debutMois.setHours(0, 0, 0, 0);
+
+    const finMois = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    finMois.setHours(23, 59, 59, 999);
+
+    const total = await this.venteModel.countDocuments({
+      date_vente: { $gte: debutMois, $lte: finMois },
+      statut_vente: { $in: ['PAYE', 'LIVREE'] },
+    });
+
+    return {
+      mois: now.getMonth() + 1,
+      annee: now.getFullYear(),
+      totalVentesRealisees: total,
+    };
+  }
+
   async update(id: string, data: any) {
     if (!Util.ObjectId.isValid(id)) {
       throw new BadRequestException("L'id est invalide");

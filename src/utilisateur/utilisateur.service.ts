@@ -109,6 +109,30 @@ export class UtilisateurService {
     };
   }
 
+  async updatePassword(id: string, password: string){
+    if (!Util.ObjectId.isValid(id)) {
+      throw new BadRequestException("L'id est invalide !");
+    }
+
+    const utilisateur = await this.utilisateurModel.findById(id)
+
+    if (!utilisateur){
+      throw new NotFoundException("Cet utilisateur est introuvable !")
+    }
+
+    const hash = await argon2.hash(password)
+
+    const response = await this.utilisateurModel.findByIdAndUpdate(id, { password: hash}, {new: true})
+
+    if (!response){
+      throw new NotFoundException("Cet utilisateur est introuvable donc impossible de modifier le mot de passe !")
+    }
+
+    return {
+      message: "Le mot de passe a ete modifie avec succes !"
+    }
+  }
+
   async update(id: string, data: any) {
     if (!Util.ObjectId.isValid(id)) {
       throw new BadRequestException("L'id est invalide !");
