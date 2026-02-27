@@ -14,6 +14,12 @@ export class Vente extends Document {
   client_id: Types.ObjectId;
 
   @Prop({
+    type: Types.ObjectId,
+    ref: 'Utilisateur',
+  })
+  utilisateur_id: Types.ObjectId;
+
+  @Prop({
     type: Date,
     default: new Date(),
   })

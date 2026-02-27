@@ -12,16 +12,30 @@ export class ReferenceService {
     return `${prefix}-${date}-${counter}`;
   }
 
-  generateTransactionReference(prefix: string, counterDigits = 2) {
+  generateSallReference(prefix: string, counterDigits = 2) {
     if (!prefix) throw new Error('Le préfixe ne peut pas être vide');
 
-    const date = dayjs().format('YYYYMMDD');
+    const date = dayjs().format('YYYY-MM-DD');
 
     const count = (this.lastCounts[date] || 0) + 1;
     this.lastCounts[date] = count;
 
     const counter = String(count).padStart(counterDigits, '0');
 
-    return `${prefix}${date}${counter}`;
+    return `${prefix}-${date}-${counter}`;
+  }
+
+
+  generateTransactionReference(prefix: string, counterDigits = 2) {
+    if (!prefix) throw new Error('Le préfixe ne peut pas être vide');
+
+    const date = dayjs().format('YYYY-MM-DD');
+
+    const count = (this.lastCounts[date] || 0) + 1;
+    this.lastCounts[date] = count;
+
+    const counter = String(count).padStart(counterDigits, '0');
+
+    return `${prefix}-${date}-${counter}`;
   }
 }

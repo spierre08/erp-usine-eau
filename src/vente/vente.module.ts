@@ -8,6 +8,7 @@ import { PanierVenteModule } from 'src/panier-vente/panier-vente.module';
 import { ArticleModule } from 'src/article/article.module';
 import { MouvementStockModule } from 'src/mouvement-stock/mouvement-stock.module';
 import { ReferenceModule } from 'src/reference/reference.module';
+import { UtilisateurModule } from 'src/utilisateur/utilisateur.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ReferenceModule } from 'src/reference/reference.module';
     ArticleModule,
     MouvementStockModule,
     ReferenceModule,
+    UtilisateurModule
   ],
   controllers: [VenteController],
   providers: [VenteService],

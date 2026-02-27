@@ -16,6 +16,7 @@ import { ReferenceService } from 'src/reference/reference.service';
 import dayjs from 'dayjs';
 import { MouvementStockService } from 'src/mouvement-stock/mouvement-stock.service';
 import { TypeMouvementStock } from 'src/mouvement-stock/enum/type-mouvement.dto';
+import { UtilisateurService } from 'src/utilisateur/utilisateur.service';
 
 @Injectable()
 export class VenteService {
@@ -26,6 +27,7 @@ export class VenteService {
     private readonly articleService: ArticleService,
     private readonly referenceService: ReferenceService,
     private readonly mouvementStock: MouvementStockService,
+    private readonly utilisateurService: UtilisateurService,
   ) {}
 
   async create(data: VenteDto) {
@@ -36,8 +38,21 @@ export class VenteService {
       createdAt: { $gte: start, $lte: end },
     });
 
-    const reference = this.referenceService.generate('FAC', countToday);
+    if (!Util.ObjectId.isValid(data?.utilisateur_id)){
+      throw new BadRequestException("L'id de l'utilisateur est invalide")
+    }
 
+    if (!Util.ObjectId.isValid(data?.client_id)){
+      throw new BadRequestException("L'id du client est invalide")
+    }
+
+    const reference = this.referenceService.generateSallReference('FAC', 2);
+
+    const utilisateur = await this.utilisateurService.getById(data.utilisateur_id);
+    if (!utilisateur) {
+      throw new NotFoundException("Cet utilisateur n'existe pas !");
+    }
+    
     const client = await this.clientService.getById(data.client_id);
     if (!client) {
       throw new NotFoundException("Ce client n'existe pas !");
@@ -45,6 +60,7 @@ export class VenteService {
 
     const vente = await this.venteModel.create({
       client_id: data.client_id,
+      utilisateur_id: data.utilisateur_id,
       statut_vente: data.statut_vente ?? StatutEnum.EN_ATTENTE,
       date_vente: new Date(),
       ref_vente: reference,
@@ -112,7 +128,8 @@ export class VenteService {
 
     const response = await this.venteModel
       .findById(id)
-      .populate('_id', 'nom tel adresse');
+      .populate('client_id', 'nom tel adresse')
+      .populate('utilisateur_id', 'nom_utilisateur');
 
     if (!response) {
       throw new NotFoundException("Cette vente n'existe pas !");
@@ -181,6 +198,7 @@ export class VenteService {
     const response = await this.venteModel
       .find(query)
       .populate('client_id', 'nom tel adresse')
+      .populate('utilisateur_id', 'nom_utilisateur')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limitNumber);
@@ -262,6 +280,19 @@ export class VenteService {
       throw new NotFoundException(
         "Cette vente n'existe pas ou a déjà été supprimée !",
       );
+    }
+
+    if (vente.statut_vente === 'PAYE') {
+      throw new BadRequestException('Cette vente est déjà payée');
+    }
+
+
+    if (vente.statut_vente === 'PAYE_PARTIEL') {
+      throw new BadRequestException('Cette vente est déjà payée partiellement');
+    }
+
+    if (vente.statut_vente === 'LIVREE') {
+      throw new BadRequestException('Cette vente est déjà livrée');
     }
 
     vente.statut_vente = statut_vente;

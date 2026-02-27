@@ -27,6 +27,10 @@ export class VenteDto {
   @IsNotEmpty({ message: "L'id du client est requis !" })
   client_id: string;
 
+  @IsString({ message: "L'id de l'utilisateur doit être de type chaine" })
+  @IsNotEmpty({ message: "L'id de l'utilisateur est requis !" })
+  utilisateur_id: string;
+
   @IsString({ message: 'Le statut de la vente doit être de type chaine' })
   @IsOptional()
   @IsEnum(StatutEnum, { message: 'Le statut que vous choisi est invalide !' })
