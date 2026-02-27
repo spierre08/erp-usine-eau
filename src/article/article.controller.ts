@@ -17,7 +17,7 @@ import { StockUpDto } from './dto/stock-up.dto';
 
 @Controller('articles')
 export class ArticleController {
-  constructor(private readonly articleService: ArticleService) { }
+  constructor(private readonly articleService: ArticleService) {}
 
   @Roles(Role.ADMIN)
   @Post()

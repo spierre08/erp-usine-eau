@@ -54,4 +54,8 @@ export class AuthService {
       token,
     };
   }
+
+  async updatePassword(id: string, password: string) {
+    return this.utilisateurService.updatePassword(id, password);
+  }
 }

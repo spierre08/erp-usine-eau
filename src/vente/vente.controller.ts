@@ -14,40 +14,43 @@ import { StatutEnum } from './enum/statut-vente.enum';
 
 @Controller('ventes')
 export class VenteController {
-  constructor(private readonly venteService: VenteService) { }
+  constructor(private readonly venteService: VenteService) {}
 
   @Post()
   async create(@Body() data: VenteDto) {
     return await this.venteService.create(data);
   }
 
-  @Get("total-ventes-realisees-mois")
+  @Get('total-ventes-realisees-mois')
   async getTotalVentesRealiseesMois() {
     return await this.venteService.getTotalVentesRealiseesMois();
   }
 
-  @Get(":id")
-  async getById(@Param("id") id: string) {
-    return await this.venteService.getById(id)
+  @Get(':id')
+  async getById(@Param('id') id: string) {
+    return await this.venteService.getById(id);
   }
 
   @Get()
   async getAll(@Query() filter: any) {
-    return await this.venteService.getAll(filter)
+    return await this.venteService.getAll(filter);
   }
 
-  @Patch(":id")
-  async update(@Param("id") id: string, @Body() data: any) {
-    return await this.venteService.update(id, data)
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() data: any) {
+    return await this.venteService.update(id, data);
   }
 
-  @Patch("status/:id")
-  async updateStatus(@Param("id") id: string, data: { statut_vente: StatutEnum }) {
+  @Patch('status/:id')
+  async updateStatus(
+    @Param('id') id: string,
+    data: { statut_vente: StatutEnum },
+  ) {
     return await this.venteService.updateStatus(id, data.statut_vente);
   }
 
-  @Delete(":id")
-  async delete(@Param("id") id: string) {
-    return this.venteService.delete(id)
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return this.venteService.delete(id);
   }
 }

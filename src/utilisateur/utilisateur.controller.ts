@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { UtilisateurService } from './utilisateur.service';
 import { CreateUtilisateurDto } from './dto/create-utilisateur.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
 import { Roles } from 'src/auth/decorator/role.decorator';
 import { Role } from 'src/auth/enum/role.enum';
 
@@ -40,12 +39,6 @@ export class UtilisateurController {
   @Patch(':id')
   async update(@Param('id') id: string, @Body() data: any) {
     return this.utilisateurService.update(id, data);
-  }
-
-  @Roles(Role.ADMIN)
-  @Patch(':id')
-  async updatePassword(@Param('id') id: string, @Body() data: UpdatePasswordDto) {
-    return this.utilisateurService.updatePassword(id, data.password);
   }
 
   @Roles(Role.ADMIN)

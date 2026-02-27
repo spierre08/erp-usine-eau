@@ -8,7 +8,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as argon2 from 'argon2';
 import { Utilisateur } from './model/utilisateur.model';
-import { CreateUtilisateurDto } from './dto/create-utilisateur.dto';
 import { Util } from 'src/common/utils/utils';
 
 @Injectable()

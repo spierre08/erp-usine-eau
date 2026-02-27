@@ -205,7 +205,7 @@ export class VenteService {
 
   async getTotalVentesRealiseesMois() {
     const now = new Date();
-    
+
     const debutMois = new Date(now.getFullYear(), now.getMonth(), 1);
     debutMois.setHours(0, 0, 0, 0);
 
@@ -239,21 +239,26 @@ export class VenteService {
     return response;
   }
 
-  async updateStatus(id: string, statut_vente: StatutEnum){
-    if (!Util.ObjectId.isValid(id)){
+  async updateStatus(id: string, statut_vente: StatutEnum) {
+    if (!Util.ObjectId.isValid(id)) {
       throw new BadRequestException("L'id est invalide");
     }
 
-  
-    const statusArrayValid: string[] = ["EN_ATTENTE", "PAYE_PARTIEL", "PAYE", "LIVREE", "ANNULEE"];
+    const statusArrayValid: string[] = [
+      'EN_ATTENTE',
+      'PAYE_PARTIEL',
+      'PAYE',
+      'LIVREE',
+      'ANNULEE',
+    ];
 
-    if (!statusArrayValid.includes(statut_vente)){
-      throw new BadRequestException("Le statut de la vente est invalide");
+    if (!statusArrayValid.includes(statut_vente)) {
+      throw new BadRequestException('Le statut de la vente est invalide');
     }
 
     const vente = await this.venteModel.findById(id);
 
-    if (!vente){
+    if (!vente) {
       throw new NotFoundException(
         "Cette vente n'existe pas ou a déjà été supprimée !",
       );

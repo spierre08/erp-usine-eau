@@ -12,7 +12,7 @@ import { UtilisateurModule } from 'src/utilisateur/utilisateur.module';
       { name: Transaction.name, schema: TransactionSchema },
     ]),
     ReferenceModule,
-    UtilisateurModule
+    UtilisateurModule,
   ],
   controllers: [TransactionController],
   providers: [TransactionService],
