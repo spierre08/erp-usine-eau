@@ -11,26 +11,49 @@ export class SeedService implements OnModuleInit {
   constructor(
     @InjectModel(Utilisateur.name)
     private readonly utilisateurModel: Model<Utilisateur>,
-    private readonly dotenv: ConfigService,
+    private readonly configService: ConfigService,
   ) {}
 
-  async onModuleInit() {
-    const adminUsername = this.dotenv.get<string>('ADMIN') as string;
+  /**
+   * Fonction utilitaire pour hasher un mot de passe
+   */
+  private async hashPassword(password: string): Promise<string> {
+    return argon2.hash(password);
+  }
 
-    const utilisateur = await this.utilisateurModel.findOne({
-      nom_utilisateur: adminUsername,
-    });
+  /**
+   * Fonction pour créer un utilisateur si il n'existe pas
+   */
+  private async createUserIfNotExists(
+    username: string,
+    password: string,
+    role: UtilisateurRole,
+  ) {
+    const existingUser = await this.utilisateurModel.findOne({ nom_utilisateur: username });
 
-    if (!utilisateur) {
+    if (!existingUser) {
+      const hashedPassword = await this.hashPassword(password);
       await this.utilisateurModel.create({
-        nom_utilisateur: adminUsername,
-        password: await argon2.hash(
-          this.dotenv.get<string>('ADMIN_PASSWORD') as string,
-        ),
-        role: UtilisateurRole.ADMIN,
+        nom_utilisateur: username,
+        password: hashedPassword,
+        role,
       });
-
-      console.log('✅ ADMIN créé automatiquement');
+      console.log(`✅ Utilisateur '${username}' créé avec succès`);
     }
+  }
+
+  /**
+   * Seed automatique au démarrage du module
+   */
+  async onModuleInit() {
+    // Récupération des credentials depuis le .env
+    const adminUsername = this.configService.get<string>('ADMIN') as string;
+    const adminPassword = this.configService.get<string>('ADMIN_PASSWORD') as string;
+    const adminUserUsername = this.configService.get<string>('ADMIN_USER') as string;
+    const adminUserPassword = this.configService.get<string>('ADMIN_PASSWORD_USER') as string;
+
+    // Création des utilisateurs si nécessaire
+    await this.createUserIfNotExists(adminUsername, adminPassword, UtilisateurRole.ADMIN);
+    await this.createUserIfNotExists(adminUserUsername, adminUserPassword, UtilisateurRole.ADMIN);
   }
 }

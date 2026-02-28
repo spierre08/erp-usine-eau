@@ -14,6 +14,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Roles } from 'src/auth/decorator/role.decorator';
 import { Role } from 'src/auth/enum/role.enum';
 import { StockUpDto } from './dto/stock-up.dto';
+import { StockDownDto } from './dto/stock-up.dto down';
 
 @Controller('articles')
 export class ArticleController {
@@ -52,6 +53,12 @@ export class ArticleController {
   @Patch('stock-up/:id')
   stockUp(@Param('id') id: string, @Body() updateArticleDto: StockUpDto) {
     return this.articleService.stockUp(id, updateArticleDto);
+  }
+
+  @Roles(Role.ADMIN)
+  @Patch('stock-down/:id')
+  stockDown(@Param('id') id: string, @Body() updateArticleDto: StockDownDto) {
+    return this.articleService.stockDown(id, updateArticleDto);
   }
 
   @Roles(Role.ADMIN)

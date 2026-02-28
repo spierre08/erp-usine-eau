@@ -13,6 +13,7 @@ import { Util } from 'src/common/utils/utils';
 import { StockUpDto } from './dto/stock-up.dto';
 import { MouvementStockService } from 'src/mouvement-stock/mouvement-stock.service';
 import { TypeMouvementStock } from 'src/mouvement-stock/enum/type-mouvement.dto';
+import { StockDownDto } from './dto/stock-up.dto down';
 
 @Injectable()
 export class ArticleService {
@@ -135,6 +136,33 @@ export class ArticleService {
       article_id: response._id,
       quantite: data.quantity,
       type_mouvement: TypeMouvementStock.ENTRE,
+    });
+
+    return response;
+  }
+
+  async stockDown(id: string, data: StockDownDto) {
+    if (!Util.ObjectId.isValid(id)) {
+      throw new BadRequestException("L'id est invalide !");
+    }
+
+    const response = await this.articleModel.findById(id);
+
+    if (!response) {
+      throw new NotFoundException("Cet article n'eexiste pas !");
+    }
+
+    if (response?.stock_actuel < 0) {
+      throw new BadRequestException('Le stock actuel est vide !');
+    }
+
+    response.stock_actuel -= data.quantity;
+    response.save();
+
+    await this.mouvementService.create({
+      article_id: response._id,
+      quantite: data.quantity,
+      type_mouvement: TypeMouvementStock.SORTIE,
     });
 
     return response;
